@@ -1,0 +1,140 @@
+# This project was generated with 0.3.26 using template: https://github.com/beeware/briefcase-template @ v0.3.26
+[tool.briefcase]
+project_name = "Test_app"
+bundle = "com.example"
+version = "0.1.0"
+url = "https://example.com/appf"
+license.file = "LICENSE"
+author = "Jane Developer"
+author_email = "jane@example.com"
+
+[tool.briefcase.app.app]
+formal_name = "Vzmakh App"
+description = "Vzmakh App"
+long_description = """More details about the app should go here.
+"""
+sources = [
+    "src/app",
+]
+test_sources = [
+    "tests",
+]
+
+requires = [
+    "requests>=2.28.0",
+]
+test_requires = [
+    "pytest",
+]
+
+# Остальные секции остаются без изменений...
+[tool.briefcase.app.app.macOS]
+universal_build = true
+requires = [
+    "toga-cocoa~=0.5.0",
+    "std-nslog~=1.0.3",
+]
+
+[tool.briefcase.app.app.linux]
+requires = [
+    "toga-gtk~=0.5.0",
+    "pygobject < 3.52.1",
+]
+
+[tool.briefcase.app.app.linux.system.debian]
+system_requires = [
+    "libcairo2-dev",
+    "libgirepository1.0-dev",
+]
+
+system_runtime_requires = [
+    "gir1.2-gtk-3.0",
+    "libgirepository-1.0-1",
+    "libcanberra-gtk3-module",
+]
+
+[tool.briefcase.app.app.linux.system.rhel]
+system_requires = [
+    "cairo-gobject-devel",
+    "gobject-introspection-devel",
+]
+
+system_runtime_requires = [
+    "gobject-introspection",
+    "gtk3",
+    "libcanberra-gtk3",
+]
+
+[tool.briefcase.app.app.linux.system.suse]
+system_requires = [
+    "cairo-devel",
+    "gobject-introspection-devel",
+]
+
+system_runtime_requires = [
+    "gtk3",
+    "gobject-introspection", "typelib(Gtk) = 3.0",
+    "libcanberra-gtk3-module",
+]
+
+[tool.briefcase.app.app.linux.system.arch]
+system_requires = [
+    "cairo",
+    "gobject-introspection",
+    "gtk3",
+    "libcanberra",
+]
+
+system_runtime_requires = [
+    "gtk3",
+    "gobject-introspection-runtime",
+    "libcanberra",
+]
+
+[tool.briefcase.app.app.linux.appimage]
+manylinux = "manylinux_2_28"
+
+system_requires = [
+    "cairo-gobject-devel",
+    "gobject-introspection-devel",
+    "gtk3-devel",
+    "libcanberra-gtk3",
+    "PackageKit-gtk3-module",
+    "gvfs-client",
+]
+
+linuxdeploy_plugins = [
+    "DEPLOY_GTK_VERSION=3 gtk",
+]
+
+[tool.briefcase.app.app.linux.flatpak]
+flatpak_runtime = "org.gnome.Platform"
+flatpak_runtime_version = "48"
+flatpak_sdk = "org.gnome.Sdk"
+
+[tool.briefcase.app.app.windows]
+requires = [
+    "toga-winforms~=0.5.0",
+]
+
+[tool.briefcase.app.app.iOS]
+requires = [
+    "toga-iOS~=0.5.0",
+    "std-nslog~=1.0.3",
+]
+
+[tool.briefcase.app.app.android]
+requires = [
+    "toga-android~=0.5.0",
+]
+
+base_theme = "Theme.AppCompat.Light.NoActionBar"
+
+build_gradle_dependencies = [
+    "com.google.android.material:material:1.13.0",
+]
+
+[tool.briefcase.app.app.web]
+requires = [
+    "toga-web~=0.5.0",
+]
