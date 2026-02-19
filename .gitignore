@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
+#*.py[cod]
+#*$py.class
 
 # OSX useful to ignore
 *.DS_Store
@@ -31,9 +31,9 @@ Temporary Items
 *.so
 
 # Distribution / packaging
-.Python
+#.Python
 env/
-build/
+#build/
 develop-eggs/
 dist/
 downloads/
@@ -62,4 +62,4 @@ var/
 logs/
 
 # Briefcase local configuratoin
-.briefcase/
+#.briefcase/
