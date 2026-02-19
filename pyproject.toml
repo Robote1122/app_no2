@@ -3,7 +3,7 @@
 project_name = "Test_app"
 bundle = "com.example"
 version = "0.1.0"
-url = "https://example.com/appf"
+url = "https://example.com/app"
 license.file = "LICENSE"
 author = "Jane Developer"
 author_email = "jane@example.com"
