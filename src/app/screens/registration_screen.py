@@ -1,12 +1,12 @@
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN, ROW, LEFT, RIGHT
 from ..styles import MobileStyles
 
 class RegistrationScreen:
     def __init__(self, app):
         self.app = app
-        self.role = "pupil"  # По умолчанию
+        self.role = "pupil"
         self.selected_classes = []
         
     def build(self):
@@ -22,29 +22,47 @@ class RegistrationScreen:
             padding=15
         ))
         
-        # Заголовок с иконкой
-        header_box = toga.Box(style=Pack(
+        # Шапка с кнопкой назад
+        header = toga.Box(style=Pack(
             direction=ROW,
-            alignment='center',
-            margin_bottom=25
+            margin_bottom=20,
+            alignment='center'
         ))
-        header_box.add(
-            toga.Label(
-                '📝',
-                style=Pack(font_size=40, margin_right=10)
+        
+        # Кнопка "Назад" слева
+        back_button = toga.Button(
+            '←',
+            on_press=self.go_back,
+            style=Pack(
+                width=44,
+                height=44,
+                background_color='transparent',
+                font_size=24,
+                border_radius=22,
+                color=MobileStyles.COLORS['primary']
             )
         )
-        header_box.add(
+        header.add(back_button)
+        
+        # Заголовок по центру
+        header.add(
             toga.Label(
                 'Регистрация',
                 style=Pack(
-                    font_size=28,
+                    font_size=24,
                     font_weight='bold',
-                    color=MobileStyles.COLORS['text']
+                    color=MobileStyles.COLORS['text'],
+                    flex=1,
+                    text_align='center'
                 )
             )
         )
-        main_box.add(header_box)
+        
+        # Пустой элемент для баланса
+        spacer = toga.Box(style=Pack(width=44))
+        header.add(spacer)
+        
+        main_box.add(header)
         
         # Карточка с формой
         form_card = toga.Box(style=MobileStyles.card())
@@ -84,7 +102,7 @@ class RegistrationScreen:
             field_container.add(input_field)
             form_card.add(field_container)
         
-        # Выбор роли
+        # Выбор роли - разделен на две строки
         role_container = toga.Box(style=Pack(direction=COLUMN, margin=5))
         role_container.add(
             toga.Label(
@@ -93,39 +111,73 @@ class RegistrationScreen:
             )
         )
         
-        role_box = toga.Box(style=Pack(
+        # Первая строка ролей
+        role_row1 = toga.Box(style=Pack(
             direction=ROW,
-            flex_wrap='wrap',
-            margin_top=5
+            margin_top=5,
+            margin_bottom=3
         ))
         
-        roles = [
+        # Вторая строка ролей
+        role_row2 = toga.Box(style=Pack(
+            direction=ROW,
+            margin_bottom=5
+        ))
+        
+        roles_row1 = [
             ('👨‍🎓 Ученик', 'pupil', '#E3F2FD', '#1976D2'),
             ('👨‍🏫 Сотрудник', 'employee', '#F3E5F5', '#7B1FA2'),
+        ]
+        
+        roles_row2 = [
             ('👪 Родственник', 'relative', '#E8F5E8', '#2E7D32'),
-            ('🎓 Выпускник', 'graduate', '#FFF3E0', '#E65100')
+            ('🎓 Выпускник', 'graduate', '#FFF3E0', '#E65100'),
         ]
         
         self.role_buttons = {}
-        for text, value, bg_color, color in roles:
+        
+        # Добавляем первую строку
+        for text, value, bg_color, color in roles_row1:
             button = toga.Button(
                 text,
                 on_press=self.select_role,
                 style=Pack(
                     margin=3,
-                    padding=8,
+                    padding=10,
                     background_color=bg_color,
                     color=color,
                     border_radius=20,
-                    font_size=12,
-                    width=165
+                    font_size=13,
+                    font_weight='bold',
+                    flex=1
                 )
             )
             button._value = value
-            role_box.add(button)
+            role_row1.add(button)
             self.role_buttons[value] = button
         
-        role_container.add(role_box)
+        # Добавляем вторую строку
+        for text, value, bg_color, color in roles_row2:
+            button = toga.Button(
+                text,
+                on_press=self.select_role,
+                style=Pack(
+                    margin=3,
+                    padding=10,
+                    background_color=bg_color,
+                    color=color,
+                    border_radius=20,
+                    font_size=13,
+                    font_weight='bold',
+                    flex=1
+                )
+            )
+            button._value = value
+            role_row2.add(button)
+            self.role_buttons[value] = button
+        
+        role_container.add(role_row1)
+        role_container.add(role_row2)
         form_card.add(role_container)
         
         # Выбор филиала
@@ -175,11 +227,18 @@ class RegistrationScreen:
         )
         main_box.add(register_button)
         
+        # Подсвечиваем выбранную роль по умолчанию
+        self.role_buttons['pupil'].style.background_color = MobileStyles.COLORS['primary']
+        self.role_buttons['pupil'].style.color = 'white'
+        
         outer_box.add(main_box)
         main_container.content = outer_box
         return main_container
     
-    # Остальные методы остаются без изменений
+    def go_back(self, widget):
+        """Возврат на главный экран"""
+        self.app.show_main_screen()
+    
     def select_role(self, widget):
         self.role = widget._value
         self.update_class_selection()
@@ -189,8 +248,19 @@ class RegistrationScreen:
                 button.style.background_color = MobileStyles.COLORS['primary']
                 button.style.color = 'white'
             else:
-                button.style.background_color = '#f0f0f0'
-                button.style.color = MobileStyles.COLORS['text']
+                # Возвращаем исходные цвета для каждой роли
+                if value == 'pupil':
+                    button.style.background_color = '#E3F2FD'
+                    button.style.color = '#1976D2'
+                elif value == 'employee':
+                    button.style.background_color = '#F3E5F5'
+                    button.style.color = '#7B1FA2'
+                elif value == 'relative':
+                    button.style.background_color = '#E8F5E8'
+                    button.style.color = '#2E7D32'
+                elif value == 'graduate':
+                    button.style.background_color = '#FFF3E0'
+                    button.style.color = '#E65100'
     
     def update_class_selection(self):
         self.class_selection.clear()
@@ -224,7 +294,8 @@ class RegistrationScreen:
                 flex_wrap='wrap',
                 margin_top=5
             ))
-            for grade in ['1А', '1Б', '2А', '2Б', '3А']:
+            # Показываем больше классов для родителей
+            for grade in ['1А', '1Б', '2А', '2Б', '3А', '3Б', '4А', '4Б']:
                 checkbox = toga.Switch(
                     grade,
                     style=Pack(margin=5, font_size=12)
@@ -276,7 +347,7 @@ class RegistrationScreen:
             'pin_code': self.pin_code.value
         }
         
-        # Здесь ваша логика регистрации
+        # Проверка по спискам через API
         response = self.app.api_client.check_registration(registration_data)
         
         if response.get('found'):
