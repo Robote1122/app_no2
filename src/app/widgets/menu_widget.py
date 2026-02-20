@@ -1,61 +1,71 @@
 import toga
 from toga.style import Pack
-from toga.style.pack import ROW, CENTER
+from toga.style.pack import ROW, COLUMN
+from ..styles import MobileStyles
 
 class MenuWidget:
     def __init__(self, app):
         self.app = app
         
     def build(self):
-        menu_box = toga.Box(
-            style=Pack(
-                direction=ROW,
-                background_color='#f0f0f0',
-                margin=10,
-                align_items=CENTER
-            )
-        )
+        menu_box = toga.Box(style=MobileStyles.menu_bar())
         
-        # Кнопки меню
         menu_items = [
-            ('🏠', self.show_main, 'Главная'),
-            ('💬', self.show_chats, 'Чаты'),
-            ('📊', self.show_exchange, 'Биржа'),
-            ('👥', self.show_social, 'Соцсеть'),
+            ('🏠', self.show_main, 'Главная', MobileStyles.COLORS['primary']),
+            ('💬', self.show_chats, 'Чаты', '#50C878'),
+            ('📊', self.show_exchange, 'Биржа', '#FF9800'),
             ('🛒', self.show_market, 'Маркет'),
-            ('📋', self.show_more, 'Еще')
+            ('👤', self.show_profile, 'Профиль', '#9C27B0'),
         ]
         
-        for icon, handler, tooltip in menu_items:
+        for icon, handler, tooltip, color in menu_items:
+            button_container = toga.Box(style=Pack(
+                direction=COLUMN,
+                alignment='center',
+                flex=1
+            ))
+            
             button = toga.Button(
                 icon,
                 on_press=handler,
                 style=Pack(
-                    width=40,
-                    height=40,
-                    margin=(0, 5),
-                    background_color='#f0f0f0'
+                    width=44,
+                    height=44,
+                    background_color='transparent',
+                    font_size=24,
+                    border_radius=22
                 )
             )
             button.tooltip = tooltip
-            menu_box.add(button)
             
+            # Подпись под иконкой
+            label = toga.Label(
+                tooltip[:2] if len(tooltip) > 2 else tooltip,
+                style=Pack(
+                    font_size=10,
+                    color='#666',
+                    text_align='center'
+                )
+            )
+            
+            button_container.add(button)
+            button_container.add(label)
+            menu_box.add(button_container)
+        
+        # Индикатор активного пункта (можно добавить логику подсветки)
         return menu_box
+    
     def show_main(self, widget):
-        self.app.main_window.info_dialog('Основное', 'Раздел в разработке')
-        #self.app.show_main_screen()
-
+        self.app.show_main_screen()
+    
     def show_chats(self, widget):
         self.app.show_chat_list()
         
-    def show_exchange(self, widget):
-        self.app.main_window.info_dialog('Биржа', 'Раздел в разработке')
-        
-    def show_social(self, widget):
-        self.app.main_window.info_dialog('Соцсеть', 'Раздел в разработке')
-        
     def show_market(self, widget):
         self.app.main_window.info_dialog('Маркет', 'Раздел в разработке')
-        
-    def show_more(self, widget):
-        self.app.main_window.info_dialog('Еще', 'Дополнительные функции')
+    
+    def show_exchange(self, widget):
+        self.app.main_window.info_dialog('Биржа', 'Раздел в разработке')
+    
+    def show_profile(self, widget):
+        self.app.main_window.info_dialog('Профиль', 'Информация о пользователе')

@@ -1,6 +1,7 @@
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
+from ..styles import MobileStyles
 
 class RegistrationScreen:
     def __init__(self, app):
@@ -9,173 +10,245 @@ class RegistrationScreen:
         self.selected_classes = []
         
     def build(self):
-        main_container = toga.ScrollContainer(style=Pack(flex=1))
-        main_box = toga.Box(style=Pack(direction=COLUMN, margin=20))
-        # Создаем Box, который будет ловить тапы
-        tap_box = toga.Box(
-            style=Pack(flex=1),
-            on_press=self.dismiss_keyboard  # Добавляем обработчик тапа
+        main_container = toga.ScrollContainer(
+            style=Pack(flex=1, background_color=MobileStyles.COLORS['background'])
         )
-        # Заголовок
-        title = toga.Label(
-            'Регистрация',
-            style=Pack(font_size=24, font_weight='bold', margin_bottom=20)
-        )
-        main_box.add(title)
         
-        # Поле Имя
-        main_box.add(toga.Label('Имя:', style=Pack(margin_top=10)))
-        self.first_name = toga.TextInput(
-            placeholder='Введите имя (е вместо ё)',
-            style=Pack(width=300, margin=5)
-        )
-        main_box.add(self.first_name)
+        outer_box = toga.Box(style=Pack(direction=COLUMN, alignment='center'))
+        main_box = toga.Box(style=Pack(
+            direction=COLUMN,
+            width=380,
+            margin=(0, 'auto'),
+            padding=15
+        ))
         
-        # Поле Фамилия
-        main_box.add(toga.Label('Фамилия:', style=Pack(margin_top=10)))
-        self.last_name = toga.TextInput(
-            placeholder='Введите фамилию (е вместо ё)',
-            style=Pack(width=300, margin=5)
+        # Заголовок с иконкой
+        header_box = toga.Box(style=Pack(
+            direction=ROW,
+            alignment='center',
+            margin_bottom=25
+        ))
+        header_box.add(
+            toga.Label(
+                '📝',
+                style=Pack(font_size=40, margin_right=10)
+            )
         )
-        main_box.add(self.last_name)
+        header_box.add(
+            toga.Label(
+                'Регистрация',
+                style=Pack(
+                    font_size=28,
+                    font_weight='bold',
+                    color=MobileStyles.COLORS['text']
+                )
+            )
+        )
+        main_box.add(header_box)
+        
+        # Карточка с формой
+        form_card = toga.Box(style=MobileStyles.card())
+        
+        # Поля ввода с иконками
+        fields = [
+            ('👤', 'Имя', 'first_name', 'Введите имя'),
+            ('📋', 'Фамилия', 'last_name', 'Введите фамилию'),
+            ('🔐', 'Пин-код', 'pin_code', '****')
+        ]
+        
+        for icon, label_text, attr_name, placeholder in fields:
+            field_container = toga.Box(style=Pack(direction=COLUMN, margin=5))
+            
+            label_box = toga.Box(style=Pack(direction=ROW, margin_bottom=2))
+            label_box.add(
+                toga.Label(
+                    f"{icon} {label_text}",
+                    style=MobileStyles.label()
+                )
+            )
+            
+            if attr_name == 'pin_code':
+                input_field = toga.PasswordInput(
+                    placeholder=placeholder,
+                    style=MobileStyles.input_field()
+                )
+                setattr(self, attr_name, input_field)
+            else:
+                input_field = toga.TextInput(
+                    placeholder=placeholder,
+                    style=MobileStyles.input_field()
+                )
+                setattr(self, attr_name, input_field)
+            
+            field_container.add(label_box)
+            field_container.add(input_field)
+            form_card.add(field_container)
         
         # Выбор роли
-        main_box.add(toga.Label('Кто вы:', style=Pack(margin_top=10)))
+        role_container = toga.Box(style=Pack(direction=COLUMN, margin=5))
+        role_container.add(
+            toga.Label(
+                '👥 Кто вы:',
+                style=MobileStyles.label()
+            )
+        )
         
-        role_box = toga.Box(style=Pack(direction=ROW))
+        role_box = toga.Box(style=Pack(
+            direction=ROW,
+            flex_wrap='wrap',
+            margin_top=5
+        ))
+        
         roles = [
-            ('👨‍🎓 Ученик', 'pupil'),
-            ('👨‍🏫 Сотрудник', 'employee'),
-            ('👪 Родственник', 'relative'),
-            ('🎓 Выпускник', 'graduate')
+            ('👨‍🎓 Ученик', 'pupil', '#E3F2FD', '#1976D2'),
+            ('👨‍🏫 Сотрудник', 'employee', '#F3E5F5', '#7B1FA2'),
+            ('👪 Родственник', 'relative', '#E8F5E8', '#2E7D32'),
+            ('🎓 Выпускник', 'graduate', '#FFF3E0', '#E65100')
         ]
         
         self.role_buttons = {}
-        for text, value in roles:
+        for text, value, bg_color, color in roles:
             button = toga.Button(
                 text,
                 on_press=self.select_role,
-                style=Pack(margin=2, font_size=12)
+                style=Pack(
+                    margin=3,
+                    padding=8,
+                    background_color=bg_color,
+                    color=color,
+                    border_radius=20,
+                    font_size=12,
+                    width=165
+                )
             )
             button._value = value
             role_box.add(button)
             self.role_buttons[value] = button
-            
-        main_box.add(role_box)
+        
+        role_container.add(role_box)
+        form_card.add(role_container)
         
         # Выбор филиала
-        main_box.add(toga.Label('Филиал:', style=Pack(margin_top=10)))
+        branch_container = toga.Box(style=Pack(direction=COLUMN, margin=5))
+        branch_container.add(
+            toga.Label(
+                '🏫 Филиал:',
+                style=MobileStyles.label()
+            )
+        )
+        
         self.branch = toga.Selection(
             items=['Юг', 'Север', 'Центр'],
-            style=Pack(width=300, margin=5)
+            style=Pack(
+                width=340,
+                padding=10,
+                border_width=1,
+                border_color=MobileStyles.COLORS['border'],
+                border_radius=8,
+                margin_top=5
+            )
         )
-        main_box.add(self.branch)
+        branch_container.add(self.branch)
+        form_card.add(branch_container)
         
-        # Выбор класса (динамический, зависит от роли)
-        main_box.add(toga.Label('Класс:', style=Pack(margin_top=10)))
+        # Выбор класса
+        class_container = toga.Box(style=Pack(direction=COLUMN, margin=5))
+        class_container.add(
+            toga.Label(
+                '📚 Класс:',
+                style=MobileStyles.label()
+            )
+        )
+        
         self.class_selection = toga.Box(style=Pack(direction=COLUMN))
+        class_container.add(self.class_selection)
+        form_card.add(class_container)
+        
         self.update_class_selection()
-        main_box.add(self.class_selection)
-        
-        # Выбор фото
-        main_box.add(toga.Label('Фото для иконки (не обязательно):', style=Pack(margin_top=10)))
-        photo_button = toga.Button(
-            'Выбрать фото',
-            on_press=self.select_photo,
-            style=Pack(margin=5)
-        )
-        main_box.add(photo_button)
-        self.photo_path = None
-        
-        # Пин-код
-        main_box.add(toga.Label('Пин-код (4 цифры):', style=Pack(margin_top=10)))
-        self.pin_code = toga.PasswordInput(
-            placeholder='****',
-            style=Pack(width=100, margin=5)
-        )
-        main_box.add(self.pin_code)
+        main_box.add(form_card)
         
         # Кнопка регистрации
         register_button = toga.Button(
             'Зарегистрироваться',
             on_press=self.register,
-            style=Pack(
-                margin=20,
-                background_color='#4A90E2',
-                color='white',
-                font_size=16
-            )
+            style=MobileStyles.button_primary()
         )
         main_box.add(register_button)
-
-        tap_box.add(main_box)
-        main_container.content = tap_box
-
-        return main_container
-
-    def dismiss_keyboard(self, widget, **kwargs):
-        """Скрыть клавиатуру при тапе вне полей ввода"""
-        # Убираем фокус со всех полей ввода
-        if hasattr(self, 'first_name') and self.first_name.focus:
-            self.first_name.focus = False
-        if hasattr(self, 'last_name') and self.last_name.focus:
-            self.last_name.focus = False
-        if hasattr(self, 'pin_code') and self.pin_code.focus:
-            self.pin_code.focus = False
         
+        outer_box.add(main_box)
+        main_container.content = outer_box
+        return main_container
+    
+    # Остальные методы остаются без изменений
     def select_role(self, widget):
-        """Выбор роли"""
         self.role = widget._value
         self.update_class_selection()
         
-        # Визуальное выделение выбранной роли
         for value, button in self.role_buttons.items():
             if value == self.role:
-                button.style.background_color = '#4A90E2'
+                button.style.background_color = MobileStyles.COLORS['primary']
                 button.style.color = 'white'
             else:
-                button.style.background_color = None
-                button.style.color = 'black'
-                
+                button.style.background_color = '#f0f0f0'
+                button.style.color = MobileStyles.COLORS['text']
+    
     def update_class_selection(self):
-        """Обновление выбора класса в зависимости от роли"""
         self.class_selection.clear()
         
         if self.role == 'pupil':
-            # Для учеников - один класс
-            self.class_selection.add(
-                toga.Selection(
-                    items=['1А', '1Б', '2А', '2Б', '3А', '3Б', '4А', '4Б', 
-                           '5А', '5Б', '6А', '6Б', '7А', '7Б', '8А', '8Б', 
-                           '9А', '9Б', '10А', '10Б', '11А', '11Б'],
-                    style=Pack(width=200)
+            classes = ['1', '2', '3', '4',
+                       '5', '6', '7', '8',
+                       '9', '10', '11']
+            
+            class_picker = toga.Selection(
+                items=classes,
+                style=Pack(
+                    width=340,
+                    padding=10,
+                    border_width=1,
+                    border_color=MobileStyles.COLORS['border'],
+                    border_radius=8
                 )
             )
+            self.class_selection.add(class_picker)
+            
         elif self.role == 'relative':
-            # Для родителей - несколько классов
-            label = toga.Label('Выберите классы (можно несколько):')
+            label = toga.Label(
+                'Выберите классы (можно несколько):',
+                style=Pack(margin=(5, 0, 5, 0), font_size=12, color='#666')
+            )
             self.class_selection.add(label)
             
-            # Чекбоксы для классов
-            classes_box = toga.Box(style=Pack(direction=COLUMN))
+            classes_box = toga.Box(style=Pack(
+                direction=ROW,
+                flex_wrap='wrap',
+                margin_top=5
+            ))
             for grade in ['1А', '1Б', '2А', '2Б', '3А']:
-                checkbox = toga.Switch(grade, style=Pack(margin=2))
+                checkbox = toga.Switch(
+                    grade,
+                    style=Pack(margin=5, font_size=12)
+                )
                 classes_box.add(checkbox)
             self.class_selection.add(classes_box)
         else:
-            # Для остальных - класс не нужен
             self.class_selection.add(
-                toga.Label('Не требуется', style=Pack(margin=5))
+                toga.Label(
+                    'Не требуется',
+                    style=Pack(
+                        margin=5,
+                        font_size=12,
+                        color='#666',
+                        font_style='italic'
+                    )
+                )
             )
-            
+    
     def select_photo(self, widget):
-        """Выбор фото"""
-        # В реальном приложении здесь был бы диалог выбора файла
         self.app.main_window.info_dialog('Выбор фото', 'Выберите файл изображения')
-        self.photo_path = 'path/to/photo.jpg'  # Заглушка
-        
+        self.photo_path = 'path/to/photo.jpg'
+    
     def register(self, widget):
-        """Регистрация пользователя"""
         # Проверка заполнения полей
         if not self.first_name.value or not self.last_name.value or not self.pin_code.value:
             self.app.main_window.error_dialog(
@@ -183,19 +256,18 @@ class RegistrationScreen:
                 'Заполните все обязательные поля'
             )
             return
-            
+        
         if len(self.pin_code.value) != 4 or not self.pin_code.value.isdigit():
             self.app.main_window.error_dialog(
                 'Ошибка',
                 'Пин-код должен состоять из 4 цифр'
             )
             return
-            
+        
         # Замена ё на е
         first_name = self.first_name.value.replace('ё', 'е').replace('Ё', 'Е')
         last_name = self.last_name.value.replace('ё', 'е').replace('Ё', 'Е')
         
-        # Собираем данные для регистрации
         registration_data = {
             'first_name': first_name,
             'last_name': last_name,
@@ -204,15 +276,13 @@ class RegistrationScreen:
             'pin_code': self.pin_code.value
         }
         
-        # Проверка по спискам через API
+        # Здесь ваша логика регистрации
         response = self.app.api_client.check_registration(registration_data)
         
         if response.get('found'):
-            # Нашли в списках - переходим на главный экран
             self.app.handle_registration_complete({
                 'id': 'new_user_id',
                 **registration_data
             })
         else:
-            # Не нашли в списках - показываем экран с ручным вводом
             self.app.show_completion_screen(registration_data, found_in_list=False)
