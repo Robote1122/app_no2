@@ -11,7 +11,11 @@ class RegistrationScreen:
     def build(self):
         main_container = toga.ScrollContainer(style=Pack(flex=1))
         main_box = toga.Box(style=Pack(direction=COLUMN, margin=20))
-        
+        # Создаем Box, который будет ловить тапы
+        tap_box = toga.Box(
+            style=Pack(flex=1),
+            on_press=self.dismiss_keyboard  # Добавляем обработчик тапа
+        )
         # Заголовок
         title = toga.Label(
             'Регистрация',
@@ -103,9 +107,21 @@ class RegistrationScreen:
             )
         )
         main_box.add(register_button)
-        
-        main_container.content = main_box
+
+        tap_box.add(main_box)
+        main_container.content = tap_box
+
         return main_container
+
+    def dismiss_keyboard(self, widget, **kwargs):
+        """Скрыть клавиатуру при тапе вне полей ввода"""
+        # Убираем фокус со всех полей ввода
+        if hasattr(self, 'first_name') and self.first_name.focus:
+            self.first_name.focus = False
+        if hasattr(self, 'last_name') and self.last_name.focus:
+            self.last_name.focus = False
+        if hasattr(self, 'pin_code') and self.pin_code.focus:
+            self.pin_code.focus = False
         
     def select_role(self, widget):
         """Выбор роли"""

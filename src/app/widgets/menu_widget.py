@@ -18,6 +18,7 @@ class MenuWidget:
         
         # Кнопки меню
         menu_items = [
+            ('🏠', self.show_main, 'Главная'),
             ('💬', self.show_chats, 'Чаты'),
             ('📊', self.show_exchange, 'Биржа'),
             ('👥', self.show_social, 'Соцсеть'),
@@ -40,7 +41,10 @@ class MenuWidget:
             menu_box.add(button)
             
         return menu_box
-        
+    def show_main(self, widget):
+        self.app.main_window.info_dialog('Основное', 'Раздел в разработке')
+        #self.app.show_main_screen()
+
     def show_chats(self, widget):
         self.app.show_chat_list()
         

@@ -17,10 +17,6 @@ from .crypto.key_manager import KeyManager
 from .crypto.e2ee import E2EECrypto
 
 class VzmakhApp(toga.App):
-    async def run_check(self):
-        """Вспомогательный метод для запуска проверки регистрации"""
-        await self.check_registration_status(None)
-
     def __init__(self):
         super().__init__(
             formal_name='Взмах',
@@ -42,14 +38,16 @@ class VzmakhApp(toga.App):
         
         # Показываем экран загрузки
         self.show_loading_screen()
+
+        self.add_background_task(self.check_registration_status)
         
     def show_loading_screen(self):
         """Показ экрана загрузки"""
         loading_screen = LoadingScreen(self)
         self.main_window.content = loading_screen.build()
         self.main_window.show()
-
-        asyncio.create_task(self.run_check())
+        
+        self.add_background_task(self.check_registration_status)
         
     async def check_registration_status(self, widget, **kwargs):
         """Проверка статуса регистрации"""

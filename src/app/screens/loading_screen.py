@@ -6,6 +6,7 @@ import os
 class LoadingScreen:
     def __init__(self, app):
         self.app = app
+        self.progress = None  # Сохраняем ссылку на прогресс бар
         
     def build(self):
         main_box = toga.Box(
@@ -25,30 +26,23 @@ class LoadingScreen:
                 style=Pack(width=200, height=200)
             )
         except:
-            # Заглушка если нет изображения
-            logo = toga.Label(
-                '🎓',
-                style=Pack(font_size=100, color='white')
-            )
+            logo = toga.Label('🎓', style=Pack(font_size=100, color='white'))
             
-        # Текст загрузки
         loading_label = toga.Label(
             'Взмах',
-            style=Pack(
-                font_size=32,
-                font_weight='bold',
-                color='white',
-                margin_top=20
-            )
+            style=Pack(font_size=32, font_weight='bold', color='white', margin_top=20)
         )
         
-        progress = toga.ProgressBar(
-            style=Pack(width=200, margin_top=20)
-        )
-        progress.start()
+        self.progress = toga.ProgressBar(style=Pack(width=200, margin_top=20))
+        self.progress.start()
         
         main_box.add(logo)
         main_box.add(loading_label)
-        main_box.add(progress)
+        main_box.add(self.progress)
         
         return main_box
+        
+    def stop_progress(self):
+        """Остановка прогресс бара"""
+        if self.progress:
+            self.progress.stop()

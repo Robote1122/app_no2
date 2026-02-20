@@ -16,6 +16,11 @@ class ChatScreen:
         self.messages = []
         self.subscribers = []
         self.pinned_message = None
+    def handle_swipe(self, event):
+        """Обработка свайпа влево для возврата"""
+        # В Toga нет встроенной поддержки свайпов,
+        # но можно использовать аппаратную кнопку "назад" на Android
+        pass
         
     def build(self):
         # Основной контейнер
